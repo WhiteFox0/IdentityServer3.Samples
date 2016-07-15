@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>silent-renew</title>
+</head>
+<body>
+    <script src="bower_components/oidc-token-manager/dist/oidc-token-manager.js"></script>
+    <script>
+        var manager = new OidcTokenManager();
+        manager.processTokenCallbackSilent();
+    </script>
+</body>
+</html>

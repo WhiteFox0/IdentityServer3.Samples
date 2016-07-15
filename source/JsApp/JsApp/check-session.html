@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RP Check Session IFrame</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+</head>
+<body>
+    <iframe id="op"></iframe>
+    <script>
+        if (window.location.hash) {
+            // 1 - getting parameters
+            var hash = window.location.hash.substr(1);
+            var params = hash.split('&').reduce(function (curr, item) {
+                var parts = item.split('=');
+                curr[parts[0].trim()] = parts[1].trim();
+                return curr;
+            }, {});
+
+            // 2 - parameters check
+            if (!params.session_state) {
+                console.error('No session_state passed to RP session frame');
+            }
+            else if (!params.check_session_iframe) {
+                console.error('No check_session_iframe passed to RP session frame');
+            }
+            else if (!params.client_id) {
+                console.error('No client_id passed to RP session frame');
+            }
+            else {
+                var idSrvOrigin = 'https://localhost:44300';
+
+                var frame = document.getElementById('op');
+                frame.onload = function () {
+                    // 3 - posting messages
+                    var op = frame.contentWindow;
+                    var timer = window.setInterval(function () {
+                        op.postMessage(params.client_id + ' ' + params.session_state, idSrvOrigin);
+                    }, 2000);
+
+                    // 4 - receiving messages
+                    window.addEventListener('message', function (e) {
+                        if (e.origin === idSrvOrigin) {
+                            console.log('session state', e.data);
+                            if (e.data === 'changed' || e.data === 'error') {
+                                window.clearInterval(timer);
+                            }
+
+                            if (e.data === 'changed') {
+                                window.parent.postMessage('changed', 'https://localhost:44301');
+                            }
+                        }
+                    });
+                };
+
+                // 5 - loading the iframe
+                frame.src = params.check_session_iframe;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "Appjs",
+  "private": true,
+  "dependencies": {
+    "jquery": "*",
+    "bootstrap": "*",
+    "oidc-token-manager": "*"
+  }
+}
